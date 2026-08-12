@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import useSWR from "swr";
 import { useAuthStore } from "@/store/authStore";
@@ -24,6 +24,7 @@ const fetcher = (url: string) => api.get(url).then((res) => res.data);
 export default function Navbar() {
   const { user, logout, hydrate, isHydrated } = useAuthStore();
   const pathname = usePathname();
+  const router = useRouter(); // useRouter Hook
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -50,6 +51,13 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  // Handle Logout & Navigation
+  const handleLogout = () => {
+    setMenuOpen(false);
+    logout();
+    router.push("/login"); // Logout-এর পর login page-এ নেভিগেট করবে
+  };
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -195,10 +203,7 @@ export default function Navbar() {
                       </>
                     )}
                     <button
-                      onClick={() => {
-                        setMenuOpen(false);
-                        logout();
-                      }}
+                      onClick={handleLogout}
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rust hover:bg-rust/10 transition-colors"
                     >
                       <LogOut size={15} /> Log out
