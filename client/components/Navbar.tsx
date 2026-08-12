@@ -91,7 +91,7 @@ export default function Navbar() {
         {/* Primary nav */}
         <nav className="hidden md:flex items-center gap-1">
           <NavLink href="/" label="Home" />
-          <NavLink href="/products" label="Catalog" />
+          <NavLink href="/products" label="All Items" />
           {isHydrated && user && (
             <>
               <NavLink href="/orders" label="Orders" />
