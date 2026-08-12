@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ledger — Shop",
+  title: "Storefront",
   description: "A small, well-kept catalog.",
 };
 

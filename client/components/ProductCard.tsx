@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Package, ShoppingCart, Check } from "lucide-react";
+import { mutate } from "swr";
 import { Product } from "@/types";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/axios";
@@ -30,6 +31,7 @@ export default function ProductCard({
         productId: product.id,
         quantity: 1,
       });
+      await mutate(`/cart-items/user/${user.id}`);
       setStatus("added");
       setTimeout(() => setStatus("idle"), 1500);
     } catch {

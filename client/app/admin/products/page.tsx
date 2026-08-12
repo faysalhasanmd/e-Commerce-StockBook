@@ -4,6 +4,7 @@ import { useState } from "react";
 import useSWR, { mutate } from "swr";
 import { Package, Plus, Trash2, ShieldAlert, ImageOff } from "lucide-react";
 import api from "@/lib/axios";
+import Swal from "sweetalert2";
 import { ApiResponse, Category, Product } from "@/types";
 import { useAuthStore } from "@/store/authStore";
 import AdminNav from "@/components/AdminNav";
@@ -77,10 +78,32 @@ export default function AdminProductsPage() {
   };
 
   const deleteProduct = async (id: string) => {
+    const confirm = await Swal.fire({
+      title: "Delete product?",
+      text: "This will permanently delete the product.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!confirm.isConfirmed) return;
+
     setDeletingId(id);
     try {
       await api.delete(`/products/${id}`);
-      mutate("/products");
+      await mutate("/products");
+      await Swal.fire({
+        title: "Deleted",
+        text: "Product removed.",
+        icon: "success",
+      });
+    } catch (err: any) {
+      await Swal.fire({
+        title: "Error",
+        text: err?.response?.data?.message || "Could not delete product.",
+        icon: "error",
+      });
     } finally {
       setDeletingId(null);
     }

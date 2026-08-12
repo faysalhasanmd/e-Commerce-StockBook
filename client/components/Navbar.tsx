@@ -3,20 +3,36 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+import useSWR from "swr";
 import { useAuthStore } from "@/store/authStore";
+import api from "@/lib/axios";
+import { ApiResponse, CartItem } from "@/types";
 import {
+  Home,
   ShoppingCart,
   Package,
   LayoutGrid,
   LogOut,
   ChevronDown,
+  User,
 } from "lucide-react";
+
+const fetcher = (url: string) => api.get(url).then((res) => res.data);
 
 export default function Navbar() {
   const { user, logout, hydrate, isHydrated } = useAuthStore();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const { data: cartRes } = useSWR<ApiResponse<CartItem[]>>(
+    user ? `/cart-items/user/${user.id}` : null,
+    fetcher,
+  );
+  const cartCount = (cartRes?.data || []).reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  );
 
   useEffect(() => {
     hydrate();
@@ -34,21 +50,18 @@ export default function Navbar() {
   }, []);
 
   const isActive = (href: string) =>
-    href === "/products" ? pathname === "/products" : pathname.startsWith(href);
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   const NavLink = ({ href, label }: { href: string; label: string }) => (
     <Link
       href={href}
-      className={`relative px-1 py-1 text-sm transition-colors ${
+      className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
         isActive(href)
-          ? "text-paper font-medium"
-          : "text-muted hover:text-paper"
+          ? "bg-brass/10 text-brass font-medium"
+          : "text-muted hover:text-paper hover:bg-line/40"
       }`}
     >
       {label}
-      {isActive(href) && (
-        <span className="absolute -bottom-[17px] left-0 right-0 h-0.5 bg-brass rounded-full" />
-      )}
     </Link>
   );
 
@@ -66,11 +79,13 @@ export default function Navbar() {
         </Link>
 
         {/* Primary nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-1">
+          <NavLink href="/" label="Home" />
           <NavLink href="/products" label="Catalog" />
           {isHydrated && user && (
             <>
               <NavLink href="/orders" label="Orders" />
+              <NavLink href="/profile" label="Profile" />
               {(user.role === "ADMIN" || user.role === "MANAGER") && (
                 <NavLink href="/admin/products" label="Add Item" />
               )}
@@ -85,13 +100,18 @@ export default function Navbar() {
               <Link
                 href="/cart"
                 aria-label="Cart"
-                className={`p-2 rounded-full transition-colors ${
+                className={`relative p-2 rounded-full transition-colors ${
                   isActive("/cart")
                     ? "bg-brass/10 text-brass"
                     : "text-muted hover:text-paper hover:bg-panel"
                 }`}
               >
                 <ShoppingCart size={19} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-brass text-ink text-[10px] font-mono font-bold flex items-center justify-center">
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </span>
+                )}
               </Link>
 
               {/* Account menu */}
@@ -111,6 +131,27 @@ export default function Navbar() {
 
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-panel border border-line rounded-lg shadow-lg py-1 overflow-hidden">
+                    <div className="px-4 py-3 border-b">
+                      <p className="text-sm text-paper font-medium">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-muted">{user.email}</p>
+                      <p className="text-xs text-muted">Role: {user.role}</p>
+                    </div>
+                    <Link
+                      href="/"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
+                    >
+                      <Home size={15} /> Home
+                    </Link>
+                    <Link
+                      href="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
+                    >
+                      <User size={15} /> Profile
+                    </Link>
                     <Link
                       href="/orders"
                       onClick={() => setMenuOpen(false)}

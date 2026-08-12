@@ -3,6 +3,7 @@
 import useSWR, { mutate } from "swr";
 import { useRouter } from "next/navigation";
 import api from "@/lib/axios";
+import Swal from "sweetalert2";
 import { ApiResponse, CartItem } from "@/types";
 import { useAuthStore } from "@/store/authStore";
 
@@ -13,7 +14,9 @@ export default function CartPage() {
   const router = useRouter();
 
   const cartUrl = user ? `/cart-items/user/${user.id}` : null;
-  const { data, isLoading } = useSWR<ApiResponse<CartItem[]> & { summary?: any }>(cartUrl, fetcher);
+  const { data, isLoading } = useSWR<
+    ApiResponse<CartItem[]> & { summary?: any }
+  >(cartUrl, fetcher);
   const items = data?.data || [];
 
   const updateQuantity = async (id: string, quantity: number) => {
@@ -23,15 +26,64 @@ export default function CartPage() {
   };
 
   const removeItem = async (id: string) => {
-    await api.delete(`/cart-items/${id}`);
-    mutate(cartUrl);
+    const confirm = await Swal.fire({
+      title: "Remove item?",
+      text: "This will remove the item from your cart.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove it",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await api.delete(`/cart-items/${id}`);
+      await mutate(cartUrl);
+      await Swal.fire({
+        title: "Removed",
+        text: "Item removed from cart.",
+        icon: "success",
+      });
+    } catch (err: any) {
+      await Swal.fire({
+        title: "Error",
+        text: err?.response?.data?.message || "Could not remove item.",
+        icon: "error",
+      });
+    }
   };
 
   const checkout = async () => {
     if (!user) return;
-    await api.post("/orders", { userId: user.id });
-    mutate(cartUrl);
-    router.push("/orders");
+
+    const result = await Swal.fire({
+      title: "Place order?",
+      text: "Do you want to place this order now?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, place order",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await api.post("/orders", { userId: user.id });
+      await mutate(cartUrl);
+      await Swal.fire({
+        title: "Order placed",
+        text: "Your order has been placed.",
+        icon: "success",
+      });
+      router.push("/orders");
+    } catch (err: any) {
+      await Swal.fire({
+        title: "Error",
+        text: err?.response?.data?.message || "Could not place order.",
+        icon: "error",
+      });
+    }
   };
 
   if (!user) {
@@ -47,7 +99,9 @@ export default function CartPage() {
       <p className="catalog-number mb-2">Your Selections</p>
       <h1 className="font-display text-4xl text-paper mb-8">Cart</h1>
 
-      {items.length === 0 && <p className="text-muted font-mono">Your cart is empty.</p>}
+      {items.length === 0 && (
+        <p className="text-muted font-mono">Your cart is empty.</p>
+      )}
 
       <div className="space-y-3">
         {items.map((item) => (
@@ -56,8 +110,12 @@ export default function CartPage() {
             className="bg-panel border hairline rounded-sm p-4 flex items-center justify-between gap-4"
           >
             <div className="flex-1">
-              <h3 className="font-display text-lg text-paper">{item.product.title}</h3>
-              <p className="font-mono text-brass text-sm">${item.product.price.toFixed(2)}</p>
+              <h3 className="font-display text-lg text-paper">
+                {item.product.title}
+              </h3>
+              <p className="font-mono text-brass text-sm">
+                ${item.product.price.toFixed(2)}
+              </p>
             </div>
             <input
               type="number"
@@ -80,7 +138,9 @@ export default function CartPage() {
       {items.length > 0 && (
         <div className="mt-8 border-t hairline pt-6 flex items-center justify-between">
           <span className="font-mono text-muted">Total</span>
-          <span className="font-mono text-brass text-2xl">${total.toFixed(2)}</span>
+          <span className="font-mono text-brass text-2xl">
+            ${total.toFixed(2)}
+          </span>
         </div>
       )}
 
