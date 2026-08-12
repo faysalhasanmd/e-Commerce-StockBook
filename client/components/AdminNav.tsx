@@ -2,14 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Package, Tag } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { Package, Tag, Users as UsersIcon } from "lucide-react";
 
 export default function AdminNav() {
   const pathname = usePathname();
+  const { user } = useAuthStore();
 
   const tabs = [
     { href: "/admin/products", label: "Products", icon: Package },
     { href: "/admin/categories", label: "Categories", icon: Tag },
+    ...(user?.role === "MANAGER"
+      ? [{ href: "/admin/users", label: "Users", icon: UsersIcon }]
+      : []),
   ];
 
   return (

@@ -11,6 +11,8 @@ import {
   Home,
   ShoppingCart,
   Package,
+  Tag,
+  Users,
   LayoutGrid,
   LogOut,
   ChevronDown,
@@ -87,7 +89,13 @@ export default function Navbar() {
               <NavLink href="/orders" label="Orders" />
               <NavLink href="/profile" label="Profile" />
               {(user.role === "ADMIN" || user.role === "MANAGER") && (
-                <NavLink href="/admin/products" label="Add Item" />
+                <>
+                  <NavLink href="/admin/products" label="Add products" />
+                  <NavLink href="/admin/categories" label="Add categories" />
+                  {user.role === "MANAGER" && (
+                    <NavLink href="/admin/users" label="Manage users" />
+                  )}
+                </>
               )}
             </>
           )}
@@ -160,13 +168,31 @@ export default function Navbar() {
                       <Package size={15} /> Orders
                     </Link>
                     {(user.role === "ADMIN" || user.role === "MANAGER") && (
-                      <Link
-                        href="/admin/products"
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
-                      >
-                        <LayoutGrid size={15} /> Add Item
-                      </Link>
+                      <>
+                        <Link
+                          href="/admin/products"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
+                        >
+                          <Package size={15} /> Products
+                        </Link>
+                        <Link
+                          href="/admin/categories"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
+                        >
+                          <Tag size={15} /> Categories
+                        </Link>
+                        {user.role === "MANAGER" && (
+                          <Link
+                            href="/admin/users"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
+                          >
+                            <Users size={15} /> Users
+                          </Link>
+                        )}
+                      </>
                     )}
                     <button
                       onClick={() => {
