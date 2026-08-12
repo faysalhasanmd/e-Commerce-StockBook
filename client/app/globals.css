@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #ffffff;
+  color: #1c1b18;
+}
+
+::selection {
+  background-color: #a9772e;
+  color: #ffffff;
+}
+
+.catalog-number {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: #6b6862;
+}
+
+.hairline {
+  border-color: #e2ddd1;
+}
+
+/* visible keyboard focus, respected everywhere */
+:focus-visible {
+  outline: 2px solid #a9772e;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
