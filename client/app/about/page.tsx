@@ -91,9 +91,7 @@ export default function AboutPage() {
         </h2>
         <p className="text-muted text-sm max-w-xl leading-relaxed mb-5">
           Full Stack (MERN) developer, BSc in CSE at Green University of
-          Bangladesh. This project was built as the SCIC/EJP-13 backend
-          assignment — a production-style REST API paired with a matching
-          storefront.
+          Bangladesh.
         </p>
         <div className="flex gap-3">
           <a
