@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useSWR from "swr";
 import api from "@/lib/axios";
 import { ApiResponse, Category, Product } from "@/types";
 import ProductCard from "@/components/ProductCard";
 import Hero from "@/components/Hero";
+import Marquee from "@/components/Marquee";
 
 const fetcher = (url: string) => api.get(url).then((res) => res.data);
+
+const fallbackMarquee = [
+  "New arrivals weekly",
+  "Secure checkout",
+  "Fast, tracked orders",
+  "Quality guaranteed",
+];
 
 export default function ProductsPage() {
   const [categoryId, setCategoryId] = useState("");
@@ -29,9 +37,14 @@ export default function ProductsPage() {
   const products = productsRes?.data || [];
   const categories = categoriesRes?.data || [];
 
+  const marqueeItems =
+    categories.length > 0 ? categories.map((c) => c.name) : fallbackMarquee;
+
   return (
     <div>
       <Hero />
+      <Marquee items={marqueeItems} />
+
       <p className="catalog-number mb-2">The Catalog</p>
       <h1 className="font-display text-4xl text-paper mb-8">
         Every item, kept in order
