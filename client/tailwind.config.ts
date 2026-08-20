@@ -19,6 +19,15 @@ const config: Config = {
         sans: ["var(--font-space-grotesk)", "sans-serif"],
         mono: ["var(--font-jetbrains)", "monospace"],
       },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
+      animation: {
+        marquee: "marquee 30s linear infinite",
+      },
     },
   },
   plugins: [],
