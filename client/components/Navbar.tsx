@@ -17,6 +17,7 @@ import {
   LogOut,
   ChevronDown,
   User,
+  Mail,
 } from "lucide-react";
 
 const fetcher = (url: string) => api.get(url).then((res) => res.data);
@@ -93,6 +94,7 @@ export default function Navbar() {
           <NavLink href="/" label="Home" />
           <NavLink href="/about" label="About" />
           <NavLink href="/products" label="All Items" />
+          <NavLink href="/contact" label="Contact" />
           {isHydrated && user && (
             <>
               <NavLink href="/orders" label="Orders" />
@@ -161,6 +163,20 @@ export default function Navbar() {
                       className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
                     >
                       <Home size={15} /> Home
+                    </Link>
+                    <Link
+                      href="/about"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
+                    >
+                      <LayoutGrid size={15} /> About
+                    </Link>
+                    <Link
+                      href="/contact"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-paper hover:bg-line/40 md:hidden"
+                    >
+                      <Mail size={15} /> Contact
                     </Link>
                     <Link
                       href="/profile"
